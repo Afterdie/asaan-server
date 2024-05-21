@@ -40,4 +40,6 @@ app.post("/validateupc", async (req, res) => {
     console.error("Error executing the query", error);
   }
 });
-app.listen(4000, () => console.log("server listening on localHost:4000"));
+app.listen(process.env.PORT, () =>
+  console.log("server listening on localHost:4000")
+);
