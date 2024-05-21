@@ -7,6 +7,10 @@ const pool = require("./database");
 app.use(express.json());
 app.use(cors());
 
+app.get("/", (req, res) => {
+  // Send a simple text response
+  res.send("Hello, world!");
+});
 app.post("/addproduct", (req, res) => {
   console.log(req.body);
   const UPC = req.body["upc"];
