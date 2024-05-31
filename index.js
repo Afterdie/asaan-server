@@ -3,7 +3,6 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
-require("dotenv").config();
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -54,7 +53,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(process.env.PORT || 8080);
+httpServer.listen(8080);
 // const pool = require("./database");
 // app.use(express.json());
 // app.use(cors());
