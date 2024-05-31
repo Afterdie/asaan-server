@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
   },
 });
 
-console.log("server is up");
+console.log("server is up on ", process.env.PORT);
 
 //array of completed orders
 
@@ -35,10 +35,13 @@ io.on("connection", (socket) => {
     callback({ status: "success" });
   });
 
-  socket.on("confirmedOrder", ({ waiterOrder, timeStamp }, callback) => {
-    console.log(waiterOrder, timeStamp);
-    orders.push(waiterOrder);
-    io.to(socket.roomname).emit("newOrder", { waiterOrder, timeStamp });
+  socket.on("confirmedOrder", (orderDetails, callback) => {
+    console.log(orderDetails);
+    orders.push(orderDetails);
+    io.to(socket.roomname).emit("newOrder", {
+      id: orderDetails.name,
+      order: orderDetails.order,
+    });
     callback({ status: "received" });
   });
 
@@ -51,7 +54,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(3000);
+httpServer.listen(process.env.PORT || 8080);
 // const pool = require("./database");
 // app.use(express.json());
 // app.use(cors());
