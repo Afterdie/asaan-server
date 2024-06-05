@@ -1,11 +1,23 @@
 const express = require("express");
-const { createServer } = require("http");
+const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
+
+//created to prevent server spindwon on render
+const spindDownLimit = 1*60*1000
+const http = require("http")
+let selfPingTimeout
+  const selfPing = () => {
+    http.get("https://asaan-server.onrender.com", (res)=> {
+      console.log("Pinged self")
+    } )
+  }
+
+
 require("dotenv").config();
 const app = express();
-const httpServer = createServer(app);
+const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.ALLOWED_URL,
@@ -42,6 +54,11 @@ io.on("connection", (socket) => {
       order: orderDetails.order,
     });
     callback({ status: "received" });
+
+    //if a timeout had been set already it is cleared
+    if(selfPingTimeout) clearTimeout(selfPingTimeout)
+
+      selfPingTimeout = setTimeout(selfPing, spindDownLimit)
   });
 
   socket.on("getOrders", () => {
