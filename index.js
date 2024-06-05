@@ -19,7 +19,7 @@ const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.ALLOWED_URL,
+    origin: "*",
   },
 });
 
