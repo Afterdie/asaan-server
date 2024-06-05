@@ -6,7 +6,7 @@ const cors = require("cors");
 
 
 //created to prevent server spindwon on render
-const spindDownLimit = 1*60*1000
+const spindDownLimit = process.env.pingIntervalMins
 let selfPingTimeout
   const selfPing = () => {
     https.get("https://asaan-server.onrender.com", (res)=> {
