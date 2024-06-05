@@ -4,6 +4,7 @@ const https = require("https")
 const { Server } = require("socket.io");
 const cors = require("cors");
 
+require("dotenv").config();
 
 //created to prevent server spindwon on render
 let selfPingTimeout
@@ -16,7 +17,6 @@ let selfPingTimeout
   }
 
 
-require("dotenv").config();
 const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
