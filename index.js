@@ -6,14 +6,13 @@ const cors = require("cors");
 
 
 //created to prevent server spindwon on render
-const spindDownLimit = process.env.pingIntervalMins
 let selfPingTimeout
   const selfPing = () => {
     https.get("https://asaan-server.onrender.com", (res)=> {
       console.log("Pinged self")
     } )
 
-    selfPingTimeout = setTimeout(selfPing, spindDownLimit)
+    selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
   }
 
 
@@ -27,7 +26,7 @@ const io = new Server(httpServer, {
 });
 
 console.log("server is up on ", process.env.PORT);
-
+console.log("pinging every ",process.env.PINGINTERVAL," seconds")
 //array of completed orders
 
 //persisting queue of orders
@@ -39,6 +38,11 @@ io.on("connection", (socket) => {
 
   //role based join room
   socket.on("joinRoom", ({ roomname, role }, callback) => {
+    
+    //the moment user joins the room timeout begins and is refreshed when order is placed
+    if(selfPingTimeout) clearTimeout(selfPingTimeout)
+    selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+
     socket.role = role;
     socket.roomname = roomname;
     socket.join(roomname);
@@ -60,7 +64,7 @@ io.on("connection", (socket) => {
     //if a timeout had been set already it is cleared
     if(selfPingTimeout) clearTimeout(selfPingTimeout)
 
-      selfPingTimeout = setTimeout(selfPing, spindDownLimit)
+      selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
   });
 
   socket.on("getOrders", () => {
