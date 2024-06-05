@@ -1,5 +1,6 @@
 const express = require("express");
 const http = require("http");
+const https = require("https")
 const { Server } = require("socket.io");
 const cors = require("cors");
 
@@ -8,9 +9,11 @@ const cors = require("cors");
 const spindDownLimit = 1*60*1000
 let selfPingTimeout
   const selfPing = () => {
-    http.get("https://asaan-server.onrender.com", (res)=> {
+    https.get("https://asaan-server.onrender.com", (res)=> {
       console.log("Pinged self")
     } )
+
+    selfPingTimeout = setTimeout(selfPing, spindDownLimit)
   }
 
 
