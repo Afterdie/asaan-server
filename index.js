@@ -29,12 +29,21 @@ console.log("server is up on ", process.env.PORT);
 console.log("pinging every ",process.env.PINGINTERVAL," seconds")
 //array of completed orders
 
+let completedOrders = []
 //persisting queue of orders
 let orders = [];
+let orderCnt = 0;
+
+app.use(cors())
+app.use(express.json())
+
+app.get("/api/ongoingorders", (req,res)=> {
+  console.log("fetched latest orders")
+  res.json({orders})
+})
 
 //when first connection is made
 io.on("connection", (socket) => {
-  console.log(socket.id);
 
   //role based join room
   socket.on("joinRoom", ({ roomname, role }, callback) => {
@@ -43,6 +52,7 @@ io.on("connection", (socket) => {
     if(selfPingTimeout) clearTimeout(selfPingTimeout)
     selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
 
+    //assigns the roles and rooomnames to the user
     socket.role = role;
     socket.roomname = roomname;
     socket.join(roomname);
@@ -52,11 +62,17 @@ io.on("connection", (socket) => {
     callback({ status: "success" });
   });
 
+
+  //emitted from the waiter when the order is placed
   socket.on("confirmedOrder", (orderDetails, callback) => {
-    console.log(orderDetails);
+    orderCnt++;
+    orderDetails={...orderDetails, uniqueId:orderDetails.uniqueId+"#"+orderCnt.toString()}
+    console.log(orderDetails)
     orders.push(orderDetails);
+
+    //sent to the cook to signal a new order
     io.to(socket.roomname).emit("newOrder", {
-      id: orderDetails.name,
+      uniqueId: orderDetails.uniqueId,
       order: orderDetails.order,
     });
     callback({ status: "received" });
@@ -67,9 +83,13 @@ io.on("connection", (socket) => {
       selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
   });
 
-  socket.on("getOrders", () => {
-    console.log(orders);
-  });
+  //order id sent from cook and removed from orderlist and added to completed list
+  socket.on("completedOrder", ({uniqueId}, callback)=> {
+    completedOrders.push(orders.find(item => item.uniqueId == uniqueId))
+    orders = orders.filter((item)=> item.uniqueId!==uniqueId)
+
+    callback({status:"completed"})
+  })
 
   socket.on("disconnect", () => {
     console.log("left");
