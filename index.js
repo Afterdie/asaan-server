@@ -46,8 +46,8 @@ app.get("/api/ongoingorders", (req,res)=> {
 
 app.get("/api/completedorders", (req,res)=> {
   console.log("fetched completed orders")
-  completedOrders = completedOrders.sort((a,b)=> Number(b.uniqueId.split('#')[1]) -
-  Number(a.uniqueId.split('#')[1]))
+  completedOrders = completedOrders.sort((a,b)=> Number(a.uniqueId.split('#')[1]) -
+  Number(b.uniqueId.split('#')[1]))
   res.json({completedOrders})
 })
 
@@ -58,7 +58,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", ({ roomname, role }, callback) => {
     
     //the moment user joins the room timeout begins and is refreshed when order is placed
-    if(!Number(process.env.SLEEP) && selfPingTimeout) clearTimeout(selfPingTimeout)
+    if(Number(process.env.SLEEP)==0 && selfPingTimeout) clearTimeout(selfPingTimeout)
     selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
 
     //assigns the roles and rooomnames to the user
@@ -87,7 +87,7 @@ io.on("connection", (socket) => {
     callback({ status: "received" });
 
     //if a timeout had been set already it is cleared
-    if(!Number(process.env.SLEEP) && selfPingTimeout) clearTimeout(selfPingTimeout)
+    if(Number(process.env.SLEEP)==0 && selfPingTimeout) clearTimeout(selfPingTimeout)
       selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
   });
 
