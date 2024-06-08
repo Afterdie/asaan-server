@@ -44,6 +44,13 @@ app.get("/api/ongoingorders", (req,res)=> {
   res.json({orders})
 })
 
+app.get("/api/completedorders", (req,res)=> {
+  console.log("fetched completed orders")
+  completedOrders = completedOrders.sort((a,b)=> Number(b.uniqueId.split('#')[1]) -
+  Number(a.uniqueId.split('#')[1]))
+  res.json({completedOrders})
+})
+
 //when first connection is made
 io.on("connection", (socket) => {
 
