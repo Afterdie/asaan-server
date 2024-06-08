@@ -58,8 +58,10 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", ({ roomname, role }, callback) => {
     
     //the moment user joins the room timeout begins and is refreshed when order is placed
-    if(Number(process.env.SLEEP)==0 && selfPingTimeout) clearTimeout(selfPingTimeout)
-    selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    if(Number(process.env.SLEEP)==0){
+      if(selfPingTimeout) clearTimeout(selfPingTimeout)
+        selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    }
 
     //assigns the roles and rooomnames to the user
     socket.role = role;
@@ -87,8 +89,10 @@ io.on("connection", (socket) => {
     callback({ status: "received" });
 
     //if a timeout had been set already it is cleared
-    if(Number(process.env.SLEEP)==0 && selfPingTimeout) clearTimeout(selfPingTimeout)
-      selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    if(Number(process.env.SLEEP)==0){
+      if(selfPingTimeout) clearTimeout(selfPingTimeout)
+        selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    }
   });
 
   //order id sent from cook and removed from orderlist and added to completed list
