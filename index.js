@@ -27,6 +27,7 @@ const io = new Server(httpServer, {
 
 console.log("server is up on ", process.env.PORT);
 console.log("pinging every ",process.env.PINGINTERVAL," seconds")
+console.log(process.env.SLEEP, typeof(Number(process.env.SLEEP)))
 //array of completed orders
 
 let completedOrders = []
@@ -50,8 +51,8 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", ({ roomname, role }, callback) => {
     
     //the moment user joins the room timeout begins and is refreshed when order is placed
-    // if(selfPingTimeout) clearTimeout(selfPingTimeout)
-    // selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    if(!Number(process.env.SLEEP) && selfPingTimeout) clearTimeout(selfPingTimeout)
+    selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
 
     //assigns the roles and rooomnames to the user
     socket.role = role;
@@ -78,10 +79,9 @@ io.on("connection", (socket) => {
     });
     callback({ status: "received" });
 
-    // //if a timeout had been set already it is cleared
-    // if(selfPingTimeout) clearTimeout(selfPingTimeout)
-
-    //   selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    //if a timeout had been set already it is cleared
+    if(!Number(process.env.SLEEP) && selfPingTimeout) clearTimeout(selfPingTimeout)
+      selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
   });
 
   //order id sent from cook and removed from orderlist and added to completed list
@@ -89,6 +89,7 @@ io.on("connection", (socket) => {
     completedOrders.push(orders.find(item => item.uniqueId == uniqueId))
     orders = orders.filter((item)=> item.uniqueId!==uniqueId)
 
+    io.to(socket.roomname).emit('notifyOrderComplete', `${uniqueId}'s order is ready`)
     callback({status:"completed"})
   })
 
