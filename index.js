@@ -37,6 +37,7 @@ let orderCnt = 0;
 app.use(cors())
 app.use(express.json())
 
+//first time join for cook orders are sent
 app.get("/api/ongoingorders", (req,res)=> {
   console.log("fetched latest orders")
   res.json({orders})
@@ -49,8 +50,8 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", ({ roomname, role }, callback) => {
     
     //the moment user joins the room timeout begins and is refreshed when order is placed
-    if(selfPingTimeout) clearTimeout(selfPingTimeout)
-    selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    // if(selfPingTimeout) clearTimeout(selfPingTimeout)
+    // selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
 
     //assigns the roles and rooomnames to the user
     socket.role = role;
@@ -77,10 +78,10 @@ io.on("connection", (socket) => {
     });
     callback({ status: "received" });
 
-    //if a timeout had been set already it is cleared
-    if(selfPingTimeout) clearTimeout(selfPingTimeout)
+    // //if a timeout had been set already it is cleared
+    // if(selfPingTimeout) clearTimeout(selfPingTimeout)
 
-      selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
+    //   selfPingTimeout = setTimeout(selfPing, process.env.PINGINTERVAL)
   });
 
   //order id sent from cook and removed from orderlist and added to completed list
